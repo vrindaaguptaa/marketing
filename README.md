@@ -1,65 +1,133 @@
+# Marketplace Frontend 
 
-**Fusion Marketplace Frontend**
-A production-ready shadcn/ui React SPA template with Vite, TypeScript, TailwindCSS 4, and Vercel deployment.
+A **production-ready shadcn/ui React SPA template** built with **Vite,
+TypeScript, TailwindCSS 4, and Vercel deployment**.
 
-No backend included - pure frontend marketplace template. Add API endpoints only when needed (private keys, DB operations).
+This template is designed as a **pure frontend marketplace starter**.\
+No backend is included by default --- you can add API endpoints only
+when needed (for private keys, databases, or secure operations).
 
-Tech Stack
-Package Manager: npm/pnpm
+------------------------------------------------------------------------
 
-Frontend: React 18 + React Router 6 (SPA) + TypeScript + Vite 7 + TailwindCSS 4 + shadcn/ui
+# Tech Stack
 
-UI: shadcn/ui + Radix UI + TailwindCSS + class-variance-authority + clsx + tailwind-merge + Lucide React icons
+## Package Manager
 
-Testing: Vitest
+-   npm / pnpm
 
-Deployment: Vercel (global CDN, Edge Network)
+## Frontend
 
-**Project Structure**
-text
-src/                      # React SPA frontend (Vercel-ready)
-├── pages/                # Route components (index.tsx = home)
-│   └── index.tsx         # Homepage
-├── libs/                 # Custom utilities/hooks
-├── hooks/                # React hooks
-├── components/           # shadcn/ui + custom components
-│   └── ui/               # Pre-built shadcn/ui component library
-├── App.tsx               # App entry point + SPA routing
-├── main.tsx              # React entry point
-└── global.css            # TailwindCSS 4 + shadcn/ui theme
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-├── tailwind.config.js
-└── README.md
-Key Features
-SPA Routing System
-Powered by React Router 6:
+-   React 18
+-   React Router 6 (SPA Routing)
+-   TypeScript
+-   Vite 7
+-   TailwindCSS 4
+-   shadcn/ui
 
-src/pages/index.tsx = Homepage
+## UI System
 
-Routes defined in src/App.tsx
+-   shadcn/ui
+-   Radix UI
+-   TailwindCSS
+-   class-variance-authority
+-   clsx
+-   tailwind-merge
+-   Lucide React Icons
 
-File-based routing structure
+## Testing
 
-tsx
+-   Vitest
+
+## Deployment
+
+-   Vercel (Global CDN + Edge Network)
+
+------------------------------------------------------------------------
+
+# Project Structure
+
+    src/
+    │
+    ├── pages/                # Route components (index.tsx = homepage)
+    │   └── index.tsx
+    │
+    ├── libs/                 # Custom utilities
+    ├── hooks/                # React hooks
+    │
+    ├── components/           # UI components
+    │   └── ui/               # shadcn/ui component library
+    │
+    ├── App.tsx               # SPA routing configuration
+    ├── main.tsx              # React application entry
+    └── global.css            # TailwindCSS + theme configuration
+
+    Root Files
+    ├── package.json
+    ├── tsconfig.json
+    ├── vite.config.ts
+    ├── tailwind.config.js
+    └── README.md
+
+------------------------------------------------------------------------
+
+# Key Features
+
+## SPA Routing System
+
+Powered by **React Router 6**.
+
+-   `src/pages/index.tsx` → Homepage
+-   Routes defined in `src/App.tsx`
+-   Simple scalable page structure
+
+Example:
+
+``` tsx
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-<Routes>
-  <Route path="/" element={<Index />} />
-  {/* Add custom routes above catch-all */}
-  <Route path="*" element={<NotFound />} />
-</Routes>
-Styling System
-Primary: TailwindCSS 4 utility classes + shadcn/ui
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        {/* Add custom routes above catch-all */}
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
 
-Theme: Custom design tokens in src/global.css
+------------------------------------------------------------------------
 
-UI Components: Full shadcn/ui library (src/components/ui/)
+# Styling System
 
-Utility: cn() helper (clsx + tailwind-merge)
+### Primary Styling
 
-tsx
+-   TailwindCSS 4 utility classes
+-   shadcn/ui components
+
+### Theme Configuration
+
+Defined inside:
+
+    src/global.css
+
+Example:
+
+``` css
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.7 0.2 260);
+  --color-secondary: oklch(0.6 0.15 220);
+}
+```
+
+### Utility Function
+
+Use the `cn()` helper for conditional styling.
+
+``` tsx
 import { cn } from "@/libs/utils";
 
 className={cn(
@@ -67,92 +135,175 @@ className={cn(
   { "conditional-class": condition },
   props.className
 )}
-Path Aliases
-ts
-// vite.config.ts + tsconfig.json
+```
+
+------------------------------------------------------------------------
+
+# Path Aliases
+
+Configured in `vite.config.ts` and `tsconfig.json`.
+
+``` ts
 resolve: {
   alias: {
-    "@/*": "./src/*",      // React components
-    "@shared/*": "./shared/*"  // Shared types
+    "@/": "./src/",
+    "@shared/": "./shared/"
   }
 }
-🚀 **Development Commands**
-bash
-npm run dev       # Vite dev server (localhost:5173)
-npm run build     # Production build → dist/
-npm run preview   # Preview production build
-npm run typecheck # TypeScript validation
-npm run test      # Vitest tests
-Adding Features
-New Page Route
-Create src/pages/MyPage.tsx
+```
 
-Add route in src/App.tsx:
+------------------------------------------------------------------------
 
-tsx
+# Development Commands
+
+Start development server:
+
+    npm run dev
+
+Build for production:
+
+    npm run build
+
+Preview production build:
+
+    npm run preview
+
+TypeScript validation:
+
+    npm run typecheck
+
+Run tests:
+
+    npm run test
+
+------------------------------------------------------------------------
+
+# Adding Features
+
+## Create a New Page
+
+1.  Create a new file:
+
+```{=html}
+<!-- -->
+```
+    src/pages/MyPage.tsx
+
+2.  Add route in `src/App.tsx`
+
+``` tsx
 <Route path="/my-page" element={<MyPage />} />
-Custom shadcn/ui Components
-bash
-npx shadcn-ui@latest add button dialog
-# Adds to src/components/ui/
-Theme Customization
-Edit src/global.css:
+```
 
-css
-@import "tailwindcss";
+------------------------------------------------------------------------
 
+# Adding shadcn/ui Components
+
+Install new components:
+
+    npx shadcn-ui@latest add button
+    npx shadcn-ui@latest add dialog
+
+Components will be added to:
+
+    src/components/ui/
+
+------------------------------------------------------------------------
+
+# Theme Customization
+
+Edit:
+
+    src/global.css
+
+Example:
+
+``` css
 @theme {
   --color-primary: oklch(0.7 0.2 260);
   --color-secondary: oklch(0.6 0.15 220);
-  /* Add custom colors */
 }
-🚀 Vercel Deployment
-Automatic deployment on git push:
+```
 
-bash
-git add .
-git commit -m "Deploy shadcn/ui marketplace"
-git push origin main
-Vercel Features:
+------------------------------------------------------------------------
 
-✅ Global CDN (Edge Network)
+# Vercel Deployment
 
-✅ Automatic HTTPS
+Deployment is automatic on **git push**.
 
-✅ Custom domain support
+    git add .
+    git commit -m "Deploy shadcn/ui marketplace"
+    git push origin main
 
-✅ Preview deployments (every PR)
+### Vercel Features
 
-✅ Zero-config Vite + React detection
+-   Global CDN (Edge Network)
+-   Automatic HTTPS
+-   Custom domain support
+-   Preview deployments for PRs
+-   Zero-config React + Vite detection
 
-Live URL: https://your-marketplace.vercel.app
+Live URL Example:
 
-Production Build
-bash
-npm run build     # Creates dist/ folder
-npm run preview   # Test production build
-Output: Static SPA in dist/ - perfect for Vercel/Netlify/CDN
+    https://your-marketplace.vercel.app
 
-Architecture Notes
-Pure Vite + React SPA (no server bundling)
+------------------------------------------------------------------------
 
-TypeScript throughout
+# Production Build
 
-Full HMR for rapid development
+Create production build:
 
-shadcn/ui component system
+    npm run build
 
-TailwindCSS 4 with OKLCH colors
+Preview production build locally:
 
-Vercel-optimized production builds
+    npm run preview
 
-Mobile-first responsive design
+Output:
 
-Quick Start
-bash
-git clone <your-repo>
-cd Current_frontend
-npm install
-npm run dev
-# Open http://localhost:5173
-Your shadcn/ui marketplace is LIVE on Vercel! 🎉🚀
+    dist/
+
+A fully optimized **static SPA ready for Vercel, Netlify, or any CDN**.
+
+------------------------------------------------------------------------
+
+# Architecture Notes
+
+-   Pure **Vite + React SPA**
+-   **TypeScript everywhere**
+-   **Hot Module Reloading (HMR)**
+-   shadcn/ui component architecture
+-   TailwindCSS 4 with **OKLCH color system**
+-   Optimized Vercel deployment
+-   Mobile-first responsive design
+
+------------------------------------------------------------------------
+
+# Quick Start
+
+Clone the project:
+
+    git clone <repository-url>
+    cd Current_frontend
+
+Install dependencies:
+
+    npm install
+
+Start development server:
+
+    npm run dev
+
+Open:
+
+    http://localhost:5173
+
+Your **shadcn/ui marketplace frontend** is now running locally.
+
+------------------------------------------------------------------------
+
+# License
+
+This project is intended as a **starter template for marketplace
+frontends**. Customize and extend it as needed for your production
+projects.
