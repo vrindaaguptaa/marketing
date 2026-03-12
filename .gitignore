@@ -1,0 +1,62 @@
+# # Dependencies
+# node_modules/
+# pnpm-lock.yaml  # Remove if you want to commit lockfile
+
+# # Build outputs
+# dist/
+# build/
+# .vite/
+
+# # Environment
+# .env
+# .env.local
+# .env.*.local
+
+# # Builder/Deployment
+# .builder/
+# netlify/
+# coverage/
+
+# # Logs and caches
+# *.log
+# .npm
+# .eslintcache
+# .prettierrc.cache
+
+# # OS generated
+# .DS_Store
+# Thumbs.db
+
+
+
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml  # KEEP - Vercel NEEDS lockfile for reproducible builds
+
+# Build outputs
+dist/
+build/
+.vite/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Builder/Deployment
+.builder/
+netlify/
+netlify.toml     # ← ADD THIS
+server/          # ← ADD THIS
+coverage/
+
+# Logs and caches
+*.log
+.npm
+.eslintcache
+.prettierrc.cache
+
+# OS generated
+.DS_Store
+Thumbs.db
