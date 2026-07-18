@@ -14,7 +14,7 @@ export function Footer() {
               Agency<span className="text-primary">Hub</span>
             </h3>
             <p className="text-slate-400 text-sm mb-4">
-              Connecting businesses with top-tier marketing agencies across the United States.
+              Connecting businesses with top-tier marketing agencies across a worldwide network.
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-slate-400 hover:text-primary transition-colors">

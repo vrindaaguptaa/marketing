@@ -1,8 +1,11 @@
 import { X, Loader } from 'lucide-react';
 import { useState } from 'react';
 import { InteractiveStarRating } from './interactive-star-rating';
-import { SERVICES } from '@/lib/mock-data';
+import { SERVICES } from '@/lib/constants';
 import { useToast } from '@/components/ui/use-toast';
+import { submitReview } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface ReviewSubmissionModalProps {
   isOpen: boolean;
@@ -21,11 +24,14 @@ export function ReviewSubmissionModal({
 }: ReviewSubmissionModalProps) {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const [title, setTitle] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -33,6 +39,7 @@ export function ReviewSubmissionModal({
     if (rating === 0) {
       newErrors.rating = 'Please select a rating';
     }
+    if (title.trim().length < 3) newErrors.title = 'Please add a short review title';
 
     if (comment.trim().length < 20) {
       newErrors.comment = 'Review must be at least 20 characters';
@@ -109,6 +116,8 @@ export function ReviewSubmissionModal({
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  if (!user) { onClose(); navigate('/login', { state: { from: window.location.pathname } }); return; }
+
   if (!validateForm()) {
     return;
   }
@@ -116,40 +125,18 @@ export function ReviewSubmissionModal({
   setIsSubmitting(true);
 
   try {
-    // In a real app, this would be:
-    // const apiResponse = await fetch(`/api/reviews/${agencyId}`, {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ rating, comment: comment.trim(), reviewer_name: reviewerName.trim() || undefined, services: selectedServices }),
-    // });
-
-    // For now, mock API behavior without calling a real endpoint:
-    await new Promise((resolve) => setTimeout(resolve, 600)); // fake network delay
-
-    // Simulate successful response
-    const response = {
-      success: true,
-      message: "Review submitted successfully! It will be featured soon.",
-      review: {
-        id: `review_${Date.now()}`,
-        rating,
-        comment: comment.trim(),
-        reviewer_name: reviewerName.trim() || "Anonymous",
-        services: selectedServices,
-        created_at: new Date().toISOString(),
-      },
-    };
-
+    const response = await submitReview(agencyId, { rating, title: title.trim(), text: comment.trim(), services: selectedServices });
     if (response.success) {
       toast({
         title: "Review Submitted",
-        description: response.message,
+        description: response.message || 'Review submitted for moderation.',
         duration: 4000,
       });
 
       // Reset form
       setRating(0);
       setComment("");
+      setTitle("");
       setReviewerName("");
       setSelectedServices([]);
       setErrors({});
@@ -159,11 +146,9 @@ export function ReviewSubmissionModal({
       onSubmitSuccess?.();
     }
   } catch (error) {
-    // In a real app, this would come from fetch / 500
-    // For now, this is just a fallback if simulation fails
     toast({
       title: "Error",
-      description: "Failed to submit review. Please try again.",
+      description: error instanceof Error ? error.message : 'Failed to submit review. Please try again.',
       variant: "destructive",
       duration: 4000,
     });
@@ -222,6 +207,11 @@ export function ReviewSubmissionModal({
             </div>
 
             {/* Review Text */}
+            <div>
+              <label htmlFor="review-title" className="block text-sm font-semibold text-slate-900 dark:text-white mb-3">Review title</label>
+              <input id="review-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} placeholder="Summarize your experience" className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white" />
+              {errors.title && <p className="text-sm text-red-600 mt-2">{errors.title}</p>}
+            </div>
             <div>
               <label htmlFor="comment" className="block text-sm font-semibold text-slate-900 dark:text-white mb-3">
                 Your Review
@@ -285,22 +275,6 @@ export function ReviewSubmissionModal({
               </div>
             </div>
 
-            {/* Reviewer Name */}
-            <div>
-              <label htmlFor="reviewer-name" className="block text-sm font-semibold text-slate-900 dark:text-white mb-3">
-                Your Name (optional)
-              </label>
-              <input
-                id="reviewer-name"
-                type="text"
-                value={reviewerName}
-                onChange={(e) => setReviewerName(e.target.value)}
-                placeholder="Leave blank for anonymous review"
-                disabled={isSubmitting}
-                className="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-600 dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50"
-              />
-            </div>
-
             {/* Disclaimer */}
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <p className="text-xs text-blue-900 dark:text-blue-300">
@@ -323,7 +297,7 @@ export function ReviewSubmissionModal({
             </button>
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting || rating === 0 || comment.length < 20}
+              disabled={isSubmitting || rating === 0 || title.trim().length < 3 || comment.length < 20}
               className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
             >
               {isSubmitting ? (

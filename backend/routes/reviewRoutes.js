@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { createReview, deleteReview, listReviews, moderateReview, updateReview } from '../controllers/reviewController.js';
+import { adminOnly, protect } from '../middleware/authMiddleware.js';
+const router = Router();
+router.get('/agency/:agencyId', listReviews);
+router.post('/agency/:agencyId', protect, createReview);
+router.patch('/:id', protect, updateReview);
+router.delete('/:id', protect, deleteReview);
+router.patch('/:id/moderate', protect, adminOnly, moderateReview);
+export default router;

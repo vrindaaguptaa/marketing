@@ -1,160 +1,21 @@
-
-import { ExternalLink, Mail,PenTool } from 'lucide-react';
-import { Agency } from '@/lib/types';
-import { SERVICE_COLORS } from '@/lib/mock-data';
+import { Bookmark, ExternalLink, Mail, MapPin } from 'lucide-react';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Agency } from '@/lib/types';
 import { StarRating } from './star-rating';
-import { ReviewsModal } from './reviews-modal';
-import { ReviewCard } from './review-card';
-import { ReviewSubmissionModal } from './review-submission-modal';
+import { AgencyLogo } from './agency-logo';
+import { addBookmark, removeBookmark } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
+import { useToast } from './ui/use-toast';
 
-interface AgencyCardProps {
-  agency: Agency;
-  onReviewSubmitted?: () =>void;
-}
-
-export function AgencyCard({ agency, onReviewSubmitted}: AgencyCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showReviewsModal, setShowReviewsModal] = useState(false);
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const topReviews = agency.reviews.slice(0, 2);
-
-  return (
-    <>
-      <div
-        className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20 h-full flex flex-col"
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => setIsExpanded(false)}
-      >
-        {/* Header */}
-        <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50">
-          <div className="flex items-start justify-between mb-4">
-            <div className="text-5xl">{agency.logo}</div>
-            {agency.badge && (
-              <span className="inline-block bg-primary text-white text-xs font-semibold px-3 py-1 rounded-full animate-pulse">
-                {agency.badge}
-              </span>
-            )}
-          </div>
-          <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-1">
-            {agency.name}
-          </h3>
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            {agency.location}
-          </p>
-        </div>
-
-        {/* Body */}
-        <div className="flex-grow p-6">
-          {/* Description */}
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 line-clamp-2">
-            {agency.description}
-          </p>
-
-          {/* Services */}
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              Services:
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {agency.services.slice(0, isExpanded ? agency.services.length : 3).map((service) => (
-                <span
-                  key={service}
-                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full border transition-all ${SERVICE_COLORS[service]}`}
-                >
-                  {service}
-                </span>
-              ))}
-              {!isExpanded && agency.services.length > 3 && (
-                <span className="inline-block px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
-                  +{agency.services.length - 3}
-                </span>
-              )}
-            </div>
-          </div>
-
-          {/* Rating */}
-          <div className="mb-6">
-            <StarRating rating={agency.rating} count={agency.reviewCount} size="md" />
-          </div>
-
-          {/* Customer Reviews Section */}
-          <div className="border-t border-slate-200 dark:border-slate-700 pt-4 mb-4">
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-3">
-              Customer Reviews:
-            </p>
-            <div className="space-y-2 mb-3">
-              {topReviews.map((review) => (
-                <div key={review.id} className="bg-slate-50 dark:bg-slate-900/50 rounded p-2.5">
-                  <div className="flex items-start gap-2 mb-1.5">
-                    <span className="text-sm">{review.avatar}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1 flex-wrap">
-                        <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                          {review.author}
-                        </p>
-                        <StarRating rating={review.rating} size="sm" showLabel={false} />
-                      </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
-                        "{review.text}"
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowReviewsModal(true)}
-              className="text-sm font-semibold text-primary hover:text-blue-700 transition-colors"
-            >
-              Read All Reviews ({agency.reviews.length}) →
-            </button>
-          </div>
-        </div>
-
-        {/* Footer - Buttons */}
-        <div className="border-t border-slate-200 dark:border-slate-700 p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3">
-          <div className="flex gap-3">
-            <a
-              href={agency.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition-all hover:shadow-md"
-            >
-              <span>View Profile</span>
-              <ExternalLink className="h-4 w-4" />
-            </a>
-            <button className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 border border-primary text-primary hover:bg-primary/5 dark:hover:bg-primary/10 font-semibold rounded-lg transition-all">
-              <Mail className="h-4 w-4" />
-              <span>Contact</span>
-            </button>
-          </div>
-          <button
-            onClick={() => setShowSubmitModal(true)}
-            className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-all hover:shadow-md"
-          >
-            <PenTool className="h-4 w-4" />
-            <span>Write a Review</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Reviews Modal */}
-      <ReviewsModal
-        isOpen={showReviewsModal}
-        onClose={() => setShowReviewsModal(false)}
-        agencyName={agency.name}
-        reviews={agency.reviews}
-        rating={agency.rating}
-      />
-      {/* Review Submission Modal */}
-      <ReviewSubmissionModal
-        isOpen={showSubmitModal}
-        onClose={() => setShowSubmitModal(false)}
-        agencyName={agency.name}
-        agencyId={agency.id}
-        onSubmitSuccess={onReviewSubmitted}
-      />
-    </>
-  );
+interface AgencyCardProps { agency: Agency; onReviewSubmitted?: () => void; view?: 'grid' | 'list'; }
+export function AgencyCard({ agency, view = 'grid' }: AgencyCardProps) {
+  const { user } = useAuth(); const navigate = useNavigate(); const { toast } = useToast(); const [saved, setSaved] = useState(false); const [saving, setSaving] = useState(false);
+  const toggleSaved = async () => { if (!user) { navigate('/login', { state: { from: window.location.pathname } }); return; } setSaving(true); try { if (saved) await removeBookmark(agency.id); else await addBookmark(agency.id); setSaved((value) => !value); toast({ title: saved ? 'Removed from bookmarks' : 'Agency saved' }); } catch (error) { toast({ title: 'Unable to update bookmark', description: error instanceof Error ? error.message : '', variant: 'destructive' }); } finally { setSaving(false); } };
+  const services = agency.services.slice(0, 3); const moreServices = Math.max(0, agency.services.length - services.length);
+  return <article className={`group overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-slate-900/10 dark:border-slate-800 dark:bg-slate-900 ${view === 'list' ? 'flex flex-col gap-5 sm:flex-row sm:items-center' : 'flex h-[440px] flex-col'}`}>
+    <div className={view === 'list' ? 'flex shrink-0 items-start gap-4' : 'flex items-start justify-between'}><AgencyLogo name={agency.name} src={agency.logo} /><button onClick={toggleSaved} disabled={saving} aria-label={saved ? `Remove ${agency.name} bookmark` : `Save ${agency.name}`} className={`rounded-xl border p-2.5 transition hover:border-primary/30 hover:bg-blue-50 disabled:opacity-50 dark:hover:bg-blue-950 ${saved ? 'border-primary text-primary' : 'text-slate-500 dark:border-slate-700'}`}><Bookmark className={`h-4 w-4 ${saved ? 'fill-current' : ''}`} /></button></div>
+    <div className={`min-w-0 ${view === 'list' ? 'flex-1' : ''}`}><div className="flex flex-wrap items-center gap-2"><Link to={`/agency/${agency.id}`} className="truncate text-lg font-bold tracking-tight transition hover:text-primary">{agency.name}</Link>{agency.badge && <span className="rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">AI Match</span>}</div><p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500"><MapPin className="h-3.5 w-3.5" /> {agency.location}</p><p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-600 dark:text-slate-300">{agency.description || 'Explore this agency’s services, client feedback, and company profile.'}</p><div className="mt-4 flex flex-wrap gap-2">{services.map((service) => <span key={service} className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-200">{service}</span>)}{moreServices ? <span className="rounded-lg bg-blue-50 px-2.5 py-1 text-xs font-semibold text-primary dark:bg-blue-950">+{moreServices} more</span> : null}</div></div>
+    <div className={`${view === 'list' ? 'sm:ml-auto sm:w-52' : 'mt-auto'} pt-4`}><div className="min-h-6">{agency.reviewCount ? <StarRating rating={agency.rating} count={agency.reviewCount} size="sm" /> : <StarRating rating={0} count={0} size="sm" />}</div><div className="mt-4 flex items-center gap-2"><Link to={`/agency/${agency.id}`} className="flex-1 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-blue-700 hover:shadow-md">View Details</Link>{agency.websiteVerified ? <a href={agency.url} target="_blank" rel="noopener noreferrer" aria-label={`Visit ${agency.name} website`} className="rounded-xl border p-2.5 text-slate-600 transition hover:border-primary/30 hover:text-primary dark:border-slate-700 dark:text-slate-300"><ExternalLink className="h-4 w-4" /></a> : null}<a href={`mailto:?subject=${encodeURIComponent(`Agency enquiry: ${agency.name}`)}`} aria-label={`Contact ${agency.name}`} className="rounded-xl border p-2.5 text-slate-600 transition hover:border-primary/30 hover:text-primary dark:border-slate-700 dark:text-slate-300"><Mail className="h-4 w-4" /></a></div></div>
+  </article>;
 }

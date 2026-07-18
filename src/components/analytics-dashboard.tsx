@@ -1,4 +1,4 @@
-import { Building2, TrendingUp, MapPin, Award } from 'lucide-react';
+import { Building2, Globe2, MapPin, Cpu, BriefcaseBusiness, Sparkles } from 'lucide-react';
 import { Analytics } from '@/lib/types';
 
 interface AnalyticsDashboardProps {
@@ -6,54 +6,36 @@ interface AnalyticsDashboardProps {
 }
 
 export function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
-  const topServices = Object.entries(data.serviceBreakdown)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 2);
-
   const stats = [
     {
-      label: 'Total Agencies',
-      value: data.totalAgencies.toLocaleString(),
-      icon: Building2,
+      label: 'Countries Covered', value: (data.countriesCovered || 0).toLocaleString(), icon: Globe2,
       color: 'from-blue-500 to-blue-600',
       lightColor: 'from-blue-50 to-blue-100',
     },
     {
-      label: `Top Service: ${topServices[0]?.[0] || 'N/A'}`,
-      value: topServices[0]?.[1].toString() || '0',
-      subtitle: 'agencies',
-      icon: TrendingUp,
+      label: 'Cities Covered', value: (data.citiesCovered || 0).toLocaleString(), icon: MapPin,
       color: 'from-green-500 to-green-600',
       lightColor: 'from-green-50 to-green-100',
     },
     {
-      label: 'Average Rating',
-      value: data.avgRating.toFixed(1),
-      subtitle: '/ 5.0',
-      icon: Award,
+      label: 'Verified Agencies', value: (data.verifiedAgencies || data.totalAgencies).toLocaleString(), icon: Building2,
       color: 'from-amber-500 to-amber-600',
       lightColor: 'from-amber-50 to-amber-100',
     },
     {
-      label: 'US Locations',
-      value: data.locationsCount.toString(),
-      subtitle: 'states',
-      icon: MapPin,
+      label: 'Marketing Services', value: (data.servicesCovered || 0).toLocaleString(), icon: BriefcaseBusiness,
       color: 'from-purple-500 to-purple-600',
       lightColor: 'from-purple-50 to-purple-100',
     },
     {
-      label: 'Total Reviews',
-      value: data.totalReviews.toLocaleString(),
-      subtitle: 'verified',
-      icon: Building2,
+      label: 'Technologies Covered', value: (data.technologiesCovered || 0).toLocaleString(), icon: Cpu,
       color: 'from-cyan-500 to-cyan-600',
       lightColor: 'from-cyan-50 to-cyan-100',
-    },
+    }, { label: 'AI Ranking Engine', value: '8', subtitle: 'ranking factors', icon: Sparkles, color: 'from-fuchsia-500 to-violet-600', lightColor: 'from-fuchsia-50 to-violet-100' },
   ];
 
   return (
-    <section className="w-full bg-white dark:bg-slate-900 py-12 md:py-20 px-4">
+    <section id="marketplace-insights" className="w-full bg-white dark:bg-slate-900 py-12 md:py-16 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-3">
@@ -64,7 +46,7 @@ export function AnalyticsDashboard({ data }: AnalyticsDashboardProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {stats.map((stat, index) => {
             const Icon = stat.icon;
             return (

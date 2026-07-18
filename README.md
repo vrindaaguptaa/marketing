@@ -1,3 +1,25 @@
+# Agency Discovery Platform
+
+## API and deployment
+
+The existing React interface remains in `src/`; it reads agencies, analytics, and review submissions from the Express API in `backend/`. MongoDB is the only data store—there are no bundled agency records or mock-data fallback paths.
+
+1. Copy `.env.example` to `.env` and set `MONGODB_URI`, `JWT_SECRET`, `CLIENT_URL`, and (for AI features) `GEMINI_API_KEY`.
+2. Start the API: `npm run server:dev`
+3. In another terminal start the UI: `npm run dev`
+
+Set `VITE_API_URL=https://your-render-service.onrender.com/api` in Vercel. For Render, use `npm install` as the build command and `npm run server` as the start command.
+
+On its first MongoDB connection, the backend automatically imports the 360 agency records in `backend/data/agencies.json`. Searches, ranking, analytics, and all frontend data use MongoDB. The catalog uses the marketplace's exact marketing service labels and does not seed software-development services.
+
+If MongoDB already contains the previous built-in seed, replace only those built-in records once with:
+
+```bash
+REPLACE_SEED=true npm run server
+```
+
+This preserves agencies added outside the built-in seed.
+
 # Marketplace Frontend 
 
 A **production-ready shadcn/ui React SPA template** built with **Vite,

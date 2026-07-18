@@ -12,14 +12,24 @@
   },
   "scripts": {
     "dev": "vite",
+    "server": "node backend/server.js",
+    "server:dev": "node --watch backend/server.js",
+    "agencies:refresh-metadata": "node backend/scripts/refresh-agency-metadata.mjs",
+    "agencies:migrate-logos": "node backend/scripts/migrate-agency-logos.mjs",
     "build": "vite build",
     "test": "vitest --run",
     "format.fix": "prettier --write .",
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "node-cron": "^4.0.7",
     "zod": "^3.25.76"
   },
   "devDependencies": {

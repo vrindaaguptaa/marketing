@@ -1,59 +1,17 @@
-import { Moon, Sun } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Bell, ChevronDown, LayoutDashboard, LogOut, Moon, Settings, Star, Sun, Bookmark } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/auth';
+import { useToast } from '@/components/ui/use-toast';
 
 export function Header() {
-  const [isDark, setIsDark] = useState(false);
-
-  // Initialize theme from localStorage or system preference
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDark(true);
-      document.documentElement.classList.add('dark');
-    } else {
-      setIsDark(false);
-      document.documentElement.classList.remove('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newDarkMode = !isDark;
-    setIsDark(newDarkMode);
-
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
-
-  return (
-    <header className="sticky top-0 z-50 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 transition-colors">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="text-2xl font-bold text-slate-900 dark:text-white">
-            Agency<span className="text-primary">Hub</span>
-          </div>
-        </div>
-
-        {/* Right side - Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {isDark ? (
-            <Sun className="h-5 w-5" />
-          ) : (
-            <Moon className="h-5 w-5" />
-          )}
-        </button>
-      </div>
-    </header>
-  );
+  const { user, logout } = useAuth(); const navigate = useNavigate(); const { toast } = useToast();
+  const [isDark, setIsDark] = useState(false); const [menuOpen, setMenuOpen] = useState(false); const menuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { const savedTheme = localStorage.getItem('theme'); const dark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches); setIsDark(dark); document.documentElement.classList.toggle('dark', dark); }, []);
+  useEffect(() => { const close = (event: MouseEvent) => { if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false); }; document.addEventListener('mousedown', close); return () => document.removeEventListener('mousedown', close); }, []);
+  const toggleTheme = () => { const next = !isDark; setIsDark(next); document.documentElement.classList.toggle('dark', next); localStorage.setItem('theme', next ? 'dark' : 'light'); };
+  const signOut = async () => { await logout(); setMenuOpen(false); toast({ title: 'Signed out' }); navigate('/'); };
+  const avatar = user?.name?.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase();
+  const nav = <nav className="hidden items-center gap-1 md:flex"><Link to="/" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white">Home</Link><Link to="/#agencies-section" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white">Discover Agencies</Link><Link to="/?category=all#agencies-section" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white">Categories</Link>{user && <><Link to="/bookmarks" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white">Bookmarks</Link><Link to="/dashboard" className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white">Dashboard</Link></>}</nav>;
+  return <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90"><div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3"><Link to="/" aria-label="AgencyHub home" className="shrink-0 text-2xl font-extrabold tracking-tight text-slate-950 dark:text-white">Agency<span className="text-primary">Hub</span></Link>{nav}<div className="flex items-center gap-2">{user && <button type="button" aria-label="Notifications" className="hidden rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-primary sm:block dark:hover:bg-slate-800"><Bell className="h-5 w-5" /></button>}<button onClick={toggleTheme} className="rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" aria-label="Toggle dark mode">{isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}</button>{user ? <div ref={menuRef} className="relative"><button onClick={() => setMenuOpen((value) => !value)} className="flex items-center gap-2 rounded-xl p-1 pr-2 transition hover:bg-slate-100 dark:hover:bg-slate-800" aria-expanded={menuOpen}><span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 text-xs font-bold text-white">{avatar}</span><ChevronDown className="hidden h-4 text-slate-500 sm:block" /></button>{menuOpen && <div className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border bg-white p-1 shadow-xl dark:border-slate-700 dark:bg-slate-900"><p className="border-b px-3 py-2 text-xs font-semibold text-slate-500">{user.email}</p><Link onClick={() => setMenuOpen(false)} to="/dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"><LayoutDashboard className="h-4" /> Dashboard</Link><Link onClick={() => setMenuOpen(false)} to="/bookmarks" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"><Bookmark className="h-4" /> Bookmarks</Link><Link onClick={() => setMenuOpen(false)} to="/dashboard#reviews" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"><Star className="h-4" /> Reviews</Link><Link onClick={() => setMenuOpen(false)} to="/dashboard#settings" className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"><Settings className="h-4" /> Settings</Link><button onClick={signOut} className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"><LogOut className="h-4" /> Logout</button></div>}</div> : <><Link to="/login" className="text-sm font-semibold text-primary">Login</Link><Link to="/signup" className="rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700">Sign up</Link></>}</div></div></header>;
 }

@@ -1,0 +1,40 @@
+import mongoose from 'mongoose';
+const agencySchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true, index: 'text' },
+  normalizedName: { type: String, required: true, unique: true, index: true },
+  website: { type: String, trim: true, unique: true, sparse: true, index: true },
+  domain: { type: String, trim: true, index: true },
+  logo: { type: String, default: '' },
+  logoFetchedAt: Date,
+  location: { city: String, state: String, country: { type: String, default: 'United States' } },
+  technologies: { type: [String], default: [], index: true },
+  services: { type: [String], default: [], index: true },
+  employees: Number,
+  foundedYear: Number,
+  githubOrg: { type: String, index: true },
+  socialLinks: { linkedin: String, github: String, twitter: String },
+  featuredImage: String,
+  portfolioLinks: { type: [String], default: [] },
+  description: { type: String, default: '' },
+  experienceYears: Number,
+  pricing: { min: Number, max: Number, currency: { type: String, default: 'USD' } },
+  responseTimeHours: Number,
+  verifiedWebsite: { type: Boolean, default: false },
+  websiteVerified: { type: Boolean, default: false },
+  yearsInBusiness: Number,
+  external: {
+    googlePlaceId: { type: String, index: true }, googleMapsUrl: String,
+    github: { login: String, publicRepos: Number, followers: Number, activity: Number, updatedAt: Date },
+    googleReviews: [{ rating: Number, text: String, author: String, publishedAt: Date }],
+    fetchedAt: Date, expiresAt: { type: Date, index: true },
+  },
+  rating: { type: Number, min: 0, max: 5, default: 0, index: true },
+  reviewsCount: { type: Number, default: 0, min: 0, index: true },
+  rankingScore: { type: Number, default: 0, index: -1 },
+  rankingFactors: { reputation: Number, serviceMatch: Number, technologyMatch: Number, portfolioQuality: Number, companyMaturity: Number, profileCompleteness: Number, userEngagement: Number, recentActivity: Number },
+  source: { name: String, url: String, lastFetchedAt: Date },
+  isPublished: { type: Boolean, default: true, index: true },
+}, { timestamps: true });
+agencySchema.index({ isPublished: 1, rankingScore: -1 });
+agencySchema.index({ 'location.country': 1, rating: -1 });
+export default mongoose.model('Agency', agencySchema);

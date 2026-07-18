@@ -1,18 +1,8 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Footer } from "@/components/footer";
 import { ArrowLeft } from "lucide-react";
 
 const NotFound = () => {
-  const location = useLocation();
-
-  useEffect(() => {
-    console.error(
-      "404 Error: User attempted to access non-existent route:",
-      location.pathname,
-    );
-  }, [location.pathname]);
-
   return (
     <div className="w-full min-h-screen flex flex-col bg-white dark:bg-slate-950">
       {/* Main Content */}
@@ -25,13 +15,13 @@ const NotFound = () => {
           <p className="text-slate-600 dark:text-slate-400 mb-8 text-lg">
             Sorry, the page you're looking for doesn't exist. Let's get you back on track.
           </p>
-          <a
-            href="/"
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 px-8 py-3 bg-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
           >
             <ArrowLeft className="h-5 w-5" />
             Back to Home
-          </a>
+          </Link>
         </div>
       </div>
 

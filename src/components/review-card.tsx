@@ -97,6 +97,7 @@ export function ReviewCard({ review, compact = false }: ReviewCardProps) {
       </div>
 
       {/* Review Text */}
+      <h4 className="mb-1 font-semibold text-slate-900 dark:text-white">{review.title}</h4>
       <p className={`text-sm md:text-base text-slate-700 dark:text-slate-300 mb-4 ${
         compact ? 'line-clamp-2' : ''
       }`}>

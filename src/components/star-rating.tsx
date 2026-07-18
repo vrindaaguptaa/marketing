@@ -8,6 +8,7 @@ interface StarRatingProps {
 }
 
 export function StarRating({ rating, count, size = 'md', showLabel = true }: StarRatingProps) {
+  if (count === 0) return <span className="text-sm font-medium text-slate-500 dark:text-slate-400">No reviews yet · Be the first to review</span>;
   const sizeClasses = {
     sm: 'h-3 w-3',
     md: 'h-4 w-4',

@@ -1,5 +1,5 @@
 import { ChevronDown, Filter, X } from 'lucide-react';
-import { SERVICES, US_STATES } from '@/lib/mock-data';
+import { SERVICES } from '@/lib/constants';
 import { FilterState, Service } from '@/lib/types';
 import { useState } from 'react';
 
@@ -7,9 +7,11 @@ interface FiltersProps {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
   isDesktop?: boolean;
+  countries?: string[];
+  cities?: Array<{ city: string; country?: string }>;
 }
 
-export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
+export function Filters({ filters, onChange, isDesktop = true, countries = [], cities = [] }: FiltersProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>('services');
   const [isOpen, setIsOpen] = useState(isDesktop);
 
@@ -20,11 +22,13 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
     onChange({ ...filters, services: newServices });
   };
 
-  const handleStateChange = (state: string) => {
-    const newStates = filters.states.includes(state)
-      ? filters.states.filter(s => s !== state)
-      : [...filters.states, state];
-    onChange({ ...filters, states: newStates });
+  const handleCountryChange = (country: string) => {
+    const next = filters.countries.includes(country) ? filters.countries.filter((item) => item !== country) : [...filters.countries, country];
+    onChange({ ...filters, countries: next, cities: filters.cities.filter((city) => cities.some((item) => item.city === city && (!item.country || next.includes(item.country)))) });
+  };
+  const handleCityChange = (city: string) => {
+    const next = filters.cities.includes(city) ? filters.cities.filter((item) => item !== city) : [...filters.cities, city];
+    onChange({ ...filters, cities: next });
   };
 
   const handleRatingChange = (rating: number) => {
@@ -41,7 +45,7 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
   const resetFilters = () => {
     onChange({
       services: [],
-      states: [],
+      countries: [], cities: [],
       minRating: 0,
       minReviews: 0,
       sortBy: 'rating',
@@ -57,7 +61,7 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
         >
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            <span>Filters {filters.services.length + filters.states.length > 0 && `(${filters.services.length + filters.states.length})`}</span>
+            <span>Filters {filters.services.length + filters.countries.length + filters.cities.length > 0 && `(${filters.services.length + filters.countries.length + filters.cities.length})`}</span>
           </div>
           <ChevronDown className={`h-5 w-5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
@@ -69,7 +73,7 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
               expandedSection={expandedSection}
               onExpandChange={setExpandedSection}
               onServiceChange={handleServiceChange}
-              onStateChange={handleStateChange}
+              onCountryChange={handleCountryChange} onCityChange={handleCityChange} countries={countries} cities={cities}
               onRatingChange={handleRatingChange}
               onReviewsChange={handleReviewsChange}
               onSortChange={handleSortChange}
@@ -85,7 +89,7 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
     <div className="w-64 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden sticky top-4 h-fit">
       <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         <h3 className="font-bold text-slate-900 dark:text-white">Filters</h3>
-        {(filters.services.length > 0 || filters.states.length > 0) && (
+        {(filters.services.length > 0 || filters.countries.length > 0 || filters.cities.length > 0) && (
           <button
             onClick={resetFilters}
             className="text-xs font-semibold text-primary hover:underline"
@@ -100,7 +104,7 @@ export function Filters({ filters, onChange, isDesktop = true }: FiltersProps) {
           expandedSection={expandedSection}
           onExpandChange={setExpandedSection}
           onServiceChange={handleServiceChange}
-          onStateChange={handleStateChange}
+          onCountryChange={handleCountryChange} onCityChange={handleCityChange} countries={countries} cities={cities}
           onRatingChange={handleRatingChange}
           onReviewsChange={handleReviewsChange}
           onSortChange={handleSortChange}
@@ -116,7 +120,10 @@ interface FiltersContentProps {
   expandedSection: string | null;
   onExpandChange: (section: string | null) => void;
   onServiceChange: (service: Service) => void;
-  onStateChange: (state: string) => void;
+  onCountryChange: (country: string) => void;
+  onCityChange: (city: string) => void;
+  countries: string[];
+  cities: Array<{ city: string; country?: string }>;
   onRatingChange: (rating: number) => void;
   onReviewsChange: (threshold: number) => void;
   onSortChange: (sortBy: 'rating' | 'name' | 'reviewed') => void;
@@ -128,7 +135,7 @@ function FiltersContent({
   expandedSection,
   onExpandChange,
   onServiceChange,
-  onStateChange,
+  onCountryChange, onCityChange, countries, cities,
   onRatingChange,
   onReviewsChange,
   onSortChange,
@@ -254,22 +261,22 @@ function FiltersContent({
 
 
       
-      {/* Top States */}
-      <FilterSection title="Top States" id="states">
+      <FilterSection title="Countries" id="countries">
         <div className="space-y-2">
-          {['CA', 'NY', 'TX', 'FL', 'IL'].map((state) => (
-            <label key={state} className="flex items-center gap-3 cursor-pointer">
+          {countries.map((country) => (
+            <label key={country} className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                checked={filters.states.includes(state)}
-                onChange={() => onStateChange(state)}
+                checked={filters.countries.includes(country)}
+                onChange={() => onCountryChange(country)}
                 className="w-4 h-4 text-primary cursor-pointer rounded"
               />
-              <span className="text-sm text-slate-700 dark:text-slate-300">{state}</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300">{country}</span>
             </label>
           ))}
         </div>
       </FilterSection>
+      {filters.countries.length ? <FilterSection title="Cities" id="cities"><div className="space-y-2">{cities.filter((item) => !item.country || filters.countries.includes(item.country)).map((item) => <label key={`${item.country}-${item.city}`} className="flex items-center gap-3 cursor-pointer"><input type="checkbox" checked={filters.cities.includes(item.city)} onChange={() => onCityChange(item.city)} className="h-4 w-4 rounded text-primary" /><span className="text-sm text-slate-700 dark:text-slate-300">{item.city}</span></label>)}</div></FilterSection> : null}
     </>
   );
 }

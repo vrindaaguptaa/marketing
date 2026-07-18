@@ -1,0 +1,15 @@
+import { Router } from 'express';
+import { z } from 'zod';
+import { changePassword, login, logout, me, profile, signup, updateProfile } from '../controllers/authController.js';
+import { protect } from '../middleware/authMiddleware.js';
+import { validate } from '../middleware/validate.js';
+const router = Router();
+const credentials = z.object({ body: z.object({ email: z.string().email(), password: z.string().min(8) }), query: z.any(), params: z.any() });
+router.post('/signup', validate(credentials.extend({ body: credentials.shape.body.extend({ name: z.string().min(2).max(100) }) })), signup);
+router.post('/login', validate(credentials), login);
+router.post('/logout', logout);
+router.get('/me', protect, me);
+router.get('/profile', protect, profile);
+router.patch('/profile', protect, validate(z.object({ body: z.object({ name: z.string().min(2).max(100) }), query: z.any(), params: z.any() })), updateProfile);
+router.patch('/password', protect, validate(z.object({ body: z.object({ currentPassword: z.string().min(8), newPassword: z.string().min(8) }), query: z.any(), params: z.any() })), changePassword);
+export default router;
